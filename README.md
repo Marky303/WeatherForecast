@@ -17,19 +17,20 @@ Provide a more detailed description of the project. Explain its purpose, feature
 ## Installation
 List step-by-step instructions on how to install the project
 
-Pulling and running backend development server
+Pulling and running development server 
 ```
 env\Scripts\activate
-pip install celery celcery[rabbitmq] django-celery-results
-cd backend 
+pip install celery celery[rabbitmq] django-celery-results
+cd backend
 python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
 
-Running celery in a new window (Rabbitmq installed and running)
+Running celery worker in new command prompt
 ```
 env\Scripts\activate
 cd backend
 celery -A backend worker -l info -P solo
 ```
+
