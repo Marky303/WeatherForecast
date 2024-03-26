@@ -15,7 +15,6 @@ Weather forecasting assignment
 Provide a more detailed description of the project. Explain its purpose, features, and any other relevant information.
 
 ## Installation
-
 List step-by-step instructions on how to install the project
 
 ```
