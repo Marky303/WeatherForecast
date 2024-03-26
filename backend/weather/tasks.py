@@ -1,7 +1,9 @@
 from celery import shared_task
 
+# Simple task
 import time
 
-while True:
+@shared_task
+def simple():
     print("Running properly")
-    time.sleep(3)
+    return

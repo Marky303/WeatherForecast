@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # Libraries
+    'django_celery_results',
+    
     # Your apps here
     'weather',
 ]
