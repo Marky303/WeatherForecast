@@ -34,4 +34,4 @@ class Entry(models.Model):
         return 
     
     def __str__(self):
-        return str(self.time) + " : " + self.temp + " Cel"
+        return str(self.time) + " : " + str(self.temp) + " Cel"
