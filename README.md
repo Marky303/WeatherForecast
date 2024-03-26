@@ -20,7 +20,7 @@ List step-by-step instructions on how to install the project
 Pulling and running development server 
 ```
 env\Scripts\activate
-pip install celery celery[rabbitmq] django-celery-results
+pip install celery celery[rabbitmq] django-celery-results meteostat 
 cd backend
 python manage.py makemigrations
 python manage.py migrate

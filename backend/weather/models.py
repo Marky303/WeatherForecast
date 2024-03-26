@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class Entry(models.Model):
-    time = models.DateField(null=True)
+    time = models.DateTimeField(null=True)
     temp = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     dwpt = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     rhum = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
