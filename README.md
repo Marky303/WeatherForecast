@@ -18,6 +18,11 @@ Provide a more detailed description of the project. Explain its purpose, feature
 
 List step-by-step instructions on how to install the project
 
-$ git clone <this_project>
-$ env\Scripts\activate
-$ pip install ...
+```
+env\Scripts\activate
+pip install celery celery[rabbitmq] django-celery-results
+cd backend
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
