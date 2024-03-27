@@ -21,4 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
+# Running update_entry() right after starting server
+from weather.tasks import update_entry
+
+update_entry()
 
