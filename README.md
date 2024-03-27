@@ -51,7 +51,10 @@ cd backend
 celery -A your_project beat --loglevel=info
 ```
 
+
 ## Usage
 
 ## Note
 django_celery_beat can be used to track periodic tasks on django admin page
+
+
