@@ -7,12 +7,10 @@ Weather forecasting assignment
 - [About](#about)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## About
 
-Provide a more detailed description of the project. Explain its purpose, features, and any other relevant information.
+Automated weather forecasting backend using django + celery
 
 ## Installation
 List step-by-step instructions on how to install the project
@@ -34,3 +32,11 @@ cd backend
 celery -A backend worker -l info -P solo
 ```
 
+Running celery beat scheduler in new command prompt
+```
+env\Scripts\activate
+cd backend
+celery -A your_project beat --loglevel=info
+```
+
+## Usage
