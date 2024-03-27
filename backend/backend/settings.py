@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # Libraries
+    #'django_celery_beat',
     #'django_celery_results',
     
     # Your apps here
@@ -61,7 +62,7 @@ BROKER_URL = 'amqp://guest:guest@localhost:15672/'  # RabbitMQ URL
 from datetime import timedelta
 
 CELERY_BEAT_SCHEDULE = {
-    'my-periodic-task': {
+    'update_entry': {
         'task': 'weather.tasks.update_entry',
         'schedule': timedelta(hours=1),  # Adjust as needed
     },

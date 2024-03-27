@@ -1,4 +1,4 @@
-# Task scheduler
+# Task scheduler's decorator
 from celery import shared_task
 
 # Other libraries
@@ -28,7 +28,7 @@ def update_entry():
     start = (latest.time.replace(tzinfo=None)+dt.timedelta(hours=1)) if len(Entry.objects.all()) != 0 else latest     
     end = dt.datetime.now().astimezone(pytz.utc).replace(tzinfo=None)
     
-    # Get hourly data (from a specific weather station: 77219)
+    # Get hourly data (from a specific weather station: 48900)
     data = Hourly('48900', start, end)
     data = data.fetch()
     

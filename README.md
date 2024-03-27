@@ -7,12 +7,10 @@ Weather forecasting assignment
 - [About](#about)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## About
 
-Provide a more detailed description of the project. Explain its purpose, features, and any other relevant information.
+Automated weather forecasting backend using django + celery
 
 ## Installation
 List step-by-step instructions on how to install the project
@@ -20,7 +18,7 @@ List step-by-step instructions on how to install the project
 Pulling and running development server 
 ```
 env\Scripts\activate
-pip install celery celery[rabbitmq] django-celery-results meteostat 
+pip install celery celery[rabbitmq] meteostat 
 cd backend
 python manage.py makemigrations
 python manage.py migrate
@@ -34,3 +32,11 @@ cd backend
 celery -A backend worker -l info -P solo
 ```
 
+Running celery beat scheduler in new command prompt
+```
+env\Scripts\activate
+cd backend
+celery -A your_project beat --loglevel=info
+```
+
+## Usage
