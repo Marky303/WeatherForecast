@@ -21,12 +21,13 @@ def ping():
 @shared_task
 def update_entry():
     # Get latest entry time from database
-    latest = Entry.objects.latest('time')
+    latest = Entry.objects.latest('time') if len(Entry.objects.all()) != 0 else datetime(2024, 1 ,1)
     
     # Setting start and end parameters
-    start = latest.time
-    end = dt.datetime.now().astimezone(dt.timezone.utc).replace(second=0, microsecond=0)
-    
+    start = latest.time.replace(tzinfo=None) if len(Entry.objects.all()) != 0 else latest        
+    end = dt.datetime.now().astimezone(pytz.utc).replace(tzinfo=None)
+                              
+    # Fix getting duplicate of most recent entry
     print(start)
     print(end)
     
