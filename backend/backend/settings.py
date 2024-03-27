@@ -58,6 +58,15 @@ MIDDLEWARE = [
 # Celery settings
 BROKER_URL = 'amqp://guest:guest@localhost:15672/'  # RabbitMQ URL
 
+from datetime import timedelta
+
+CELERY_BEAT_SCHEDULE = {
+    'my-periodic-task': {
+        'task': 'weather.tasks.update_entry',
+        'schedule': timedelta(hours=1),  # Adjust as needed
+    },
+}
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [

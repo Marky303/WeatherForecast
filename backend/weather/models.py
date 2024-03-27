@@ -35,3 +35,6 @@ class Entry(models.Model):
     
     def __str__(self):
         return str(self.time) + " : " + str(self.temp) + " Cel"
+    
+class predicted_Entry(models.Model):
+    pass
