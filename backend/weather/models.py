@@ -1,13 +1,16 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+# Other libraries
+import math
+import pytz
+
 # Create your models here.
 class Entry(models.Model):
     time = models.DateTimeField(null=True)
     temp = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     dwpt = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     rhum = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
-    prcp = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     wdir = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     wspd = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
     pres = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
@@ -21,15 +24,21 @@ class Entry(models.Model):
 
     # series' time value is "name"
     def add_entry(s):
-        e = Entry(time=s.name,
+        # Check if coco value is nan
+        if (math.isnan(s.coco)):
+            coco_check = 0
+        else:
+            coco_check = s.coco
+            
+        # Creating and saving a new entry
+        e = Entry(time=s.name.replace(tzinfo=pytz.UTC),
                   temp=s.temp,
                   dwpt=s.dwpt,
                   rhum=s.rhum,
-                  prcp=s.prcp,
                   wdir=s.wdir,
                   wspd=s.wspd,
                   pres=s.pres,
-                  coco=s.coco)
+                  coco=coco_check)
         e.save()
         return 
     

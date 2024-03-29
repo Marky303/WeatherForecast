@@ -66,6 +66,12 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'weather.tasks.update_entry',
         'schedule': timedelta(hours=1),  # Adjust as needed
     },
+    
+    # Test periodic tasks for celery beat
+    # 'test_ping': {
+    #     'task': 'weather.tasks.ping',
+    #     'schedule': timedelta(seconds=3),  # Adjust as needed
+    # },
 }
 
 ROOT_URLCONF = 'backend.urls'

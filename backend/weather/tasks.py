@@ -6,6 +6,7 @@ import pytz
 from datetime import datetime
 import datetime as dt
 from meteostat import Hourly
+from tqdm import tqdm
 
 # Importing entry model
 from .models import *
@@ -22,11 +23,11 @@ def ping():
 @shared_task
 def update_entry():
     # Get latest entry time from database
-    latest = Entry.objects.latest('time') if len(Entry.objects.all()) != 0 else datetime(2024, 1 ,1)
+    latest = Entry.objects.latest('time') if len(Entry.objects.all()) != 0 else datetime(2021, 1 ,1)
     
     # Setting start and end parameters
-    start = (latest.time.replace(tzinfo=None)+dt.timedelta(hours=1)) if len(Entry.objects.all()) != 0 else latest     
-    end = dt.datetime.now().astimezone(pytz.utc).replace(tzinfo=None)
+    start = (latest.time.replace(tzinfo=None) + dt.timedelta(hours=1)) if len(Entry.objects.all()) != 0 else latest     
+    end = dt.datetime.now().astimezone(pytz.utc).replace(tzinfo=None) 
     
     # Get hourly data (from a specific weather station: 48900)
     data = Hourly('48900', start, end)
@@ -34,7 +35,7 @@ def update_entry():
     
     if not data.empty:
         # Saving hourly data as entries
-        for i in range(len(data)):
+        for i in tqdm(range(len(data))):
             # Access row data using df.iloc[i]
             Entry.add_entry(data.iloc[i])
         print ("successfully fetched new data")
@@ -43,6 +44,9 @@ def update_entry():
     return
 
 # Processing weather data 
-@shared_task
-def process_entry():
-    pass
+# @shared_task
+# def linear_regression():
+#     training_set = Entry.objects.all()
+    
+    
+#     pass
