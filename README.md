@@ -21,7 +21,7 @@ Install and run rabbitmq message broker
 Pulling and running development server 
 ```
 env\Scripts\activate
-pip install celery celery[rabbitmq] meteostat tqdm
+pip install celery celery[rabbitmq] meteostat tqdm django
 cd backend
 python manage.py makemigrations
 python manage.py migrate
