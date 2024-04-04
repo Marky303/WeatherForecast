@@ -21,7 +21,7 @@ Install and run rabbitmq message broker
 Pulling and running development server 
 ```
 env\Scripts\activate
-pip install celery celery[rabbitmq] meteostat tqdm django
+pip install celery celery[rabbitmq] meteostat tqdm django django-pandas numpy pandas django-extensions  ipython jupyter notebook==6.5.6 statsmodels matplotlib
 cd backend
 python manage.py makemigrations
 python manage.py migrate
@@ -56,5 +56,14 @@ celery -A your_project beat --loglevel=info
 
 ## Note
 django_celery_beat can be used to track periodic tasks on django admin page
+
+python manage.py shell_plus --notebook to run jypyter notebook
+run this in your first cell
+```
+import os, django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+django.setup()
+```
 
 

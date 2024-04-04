@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Libraries
     #'django_celery_beat',
     #'django_celery_results',
+    'django_extensions',
     
     # Your apps here
     'weather',
