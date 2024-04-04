@@ -28,7 +28,7 @@ def ping():
 @shared_task
 def update_entry():
     # Get latest entry time from database
-    latest = Entry.objects.latest('time') if len(Entry.objects.all()) != 0 else datetime(2021, 1 ,1)
+    latest = Entry.objects.latest('time') if len(Entry.objects.all()) != 0 else datetime(2017, 1 ,1)
     
     # Setting start and end parameters
     start = (latest.time.replace(tzinfo=None) + dt.timedelta(hours=1)) if len(Entry.objects.all()) != 0 else latest     
@@ -39,6 +39,10 @@ def update_entry():
     data = data.fetch()
     
     if not data.empty:
+        # Filling nan values using previous values
+        columns_to_fill = ['temp', 'dwpt', 'rhum', 'wdir', 'wspd', 'pres']
+        data[columns_to_fill] = data[columns_to_fill].fillna(method='ffill')
+        
         # Saving hourly data as entries
         for i in tqdm(range(len(data))):
             # Access row data using df.iloc[i]
