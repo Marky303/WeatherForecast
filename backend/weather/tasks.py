@@ -7,9 +7,14 @@ from datetime import datetime
 import datetime as dt
 from meteostat import Hourly
 from tqdm import tqdm
+import pandas as pd
+from django_pandas.io import read_frame
 
 # Importing entry model
 from .models import *
+
+# Global variables
+dimensions = ['temp', 'dwpt', 'rhum', 'wdir', 'wspd', 'pres']
 
 # Define your tasks here
 # Task for async testing
@@ -27,7 +32,7 @@ def update_entry():
     
     # Setting start and end parameters
     start = (latest.time.replace(tzinfo=None) + dt.timedelta(hours=1)) if len(Entry.objects.all()) != 0 else latest     
-    end = dt.datetime.now().astimezone(pytz.utc).replace(tzinfo=None) 
+    end = dt.datetime.now().astimezone(pytz.utc).replace(tzinfo=None)   
     
     # Get hourly data (from a specific weather station: 48900)
     data = Hourly('48900', start, end)
@@ -44,9 +49,27 @@ def update_entry():
     return
 
 # Processing weather data 
-# @shared_task
-# def linear_regression():
-#     training_set = Entry.objects.all()
+@shared_task
+def arima():
+    # Getting training set
+    training_set = read_frame(Entry.objects.all())
+    
+    # Preparing predictions set
+    predictions = read_frame(Entry.objects.all().order_by('-id')[:24]).sort_values(by='time')
+    for index in range(0,len(predictions)):
+        print(index)
+        predictions.iloc[index].time = predictions.iloc[index].time + dt.timedelta(days=1)
+        # predictions.loc[index, 'time'] = predictions.iloc[index].time + dt.timedelta(days=1)
+    predictions = predictions.drop(columns=['id'])
     
     
-#     pass
+    
+    print("Train")
+    print(training_set[len(training_set)-24:])
+    print("Not Train")
+    print(predictions)
+        
+        
+    
+    
+    
