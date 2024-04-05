@@ -99,4 +99,7 @@ def arima():
     for i in tqdm(range(len(predictions)), desc="Saving predicted values..."):
             Predicted_Entry.add_entry(predictions.iloc[i], new_prediction_ins)
 
-# Calculating residuals
+# Calculating accuracy
+@shared_task
+def accuracy():
+    pass
