@@ -62,7 +62,7 @@ celery -A backend beat --loglevel=info
  - **django_celery_beat** can be used to track periodic tasks on django admin page
  
  - Jupyter notebook can be used as an alternative to Django shell by: 
-	  - Running this in a separate (virtual environmented) command prompt **`celery -A backend beat --loglevel=info`**
+	  - Running this in a separate (virtual environmented) command prompt **`python manage.py shell_plus --notebook`**
 	- Then **add this** to your first cell 
 ```
 		import os, django
