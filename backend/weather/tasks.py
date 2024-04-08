@@ -15,6 +15,9 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 # Importing entry model
 from .models import *
 
+# Django db query
+from django.db.models import Q
+
 # Global variables
 # Entries' features
 dimensions = ['temp', 'dwpt', 'rhum', 'wdir', 'wspd', 'pres']
@@ -61,6 +64,9 @@ def update_entry():
         arima.delay() 
     else:
         print ("data is up to date")
+    
+    # Calculating accuracy
+    accuracy.delay()
     return
 
 # Processing weather data 
@@ -102,4 +108,56 @@ def arima():
 # Calculating accuracy
 @shared_task
 def accuracy():
-    pass
+    # Getting predictions that have been predicted over 24 hours ago
+    est_elapsed = (dt.datetime.utcnow() - dt.timedelta(hours=entry_cycle)).replace(tzinfo=pytz.utc)
+    predictions = Prediction.objects.filter(Q(prediction_time__lte=est_elapsed))
+
+    # Running loop to calculate accuracy of all predictions
+    for prediction in tqdm(predictions, desc="Calculating accuracy..."):
+        if (prediction.accuracy!=-1):
+            # Getting predicted_entries of a prediction
+            prediction_id = prediction.id
+            predicted_entries = read_frame(Predicted_Entry.objects.filter(prediction_id=prediction_id)).copy(deep=True)
+            
+            # Getting start and end time of a prediction
+            start_time = predicted_entries.iloc[0]['time']
+            end_time = predicted_entries.iloc[-1]['time']
+            
+            # Dropping unecessary columns
+            predicted_entries.drop(columns=['id', 'prediction', 'time', 'coco'], inplace=True)
+            
+            # Getting actual entries
+            actual_entries = read_frame(Entry.objects.filter(time__range=(start_time, end_time))).copy(deep=True)
+            actual_entries.drop(columns=['id', 'time', 'coco'], inplace=True)
+            
+            # Calculating residuals
+            error = (actual_entries - predicted_entries).div(actual_entries)
+        
+            # Calculating error
+            error_temp = error['temp'].abs().mean()*100
+            error_dwpt = error['dwpt'].abs().mean()*100
+            error_rhum = error['rhum'].abs().mean()*100
+            error_wdir = error['wdir'].abs().mean()*100
+            error_wspd = error['wspd'].abs().mean()*100
+            error_pres = error['pres'].abs().mean()*100
+            
+            # Calculating accuracy
+            accuracy_temp = 100 - error_temp
+            accuracy_dwpt = 100 - error_dwpt
+            accuracy_rhum = 100 - error_rhum
+            accuracy_wdir = 100 - error_wdir
+            accuracy_wspd = 100 - error_wspd
+            accuracy_pres = 100 - error_pres
+            
+            # Calculating general accuracy and saving
+            accuracy = (accuracy_temp + accuracy_dwpt + accuracy_rhum + accuracy_wdir + accuracy_wspd + accuracy_pres)/6
+            prediction.accuracy_temp = accuracy_temp
+            prediction.accuracy_dwpt = accuracy_dwpt
+            prediction.accuracy_rhum = accuracy_rhum
+            prediction.accuracy_wdir = accuracy_wdir
+            prediction.accuracy_wspd = accuracy_wspd
+            prediction.accuracy_pres = accuracy_pres
+            prediction.accuracy = accuracy
+            prediction.save()
+    print("Accuracy calculated!")
+    return
