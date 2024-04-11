@@ -92,15 +92,20 @@ class Predicted_Entry(models.Model):
         ],
         default = 0
     )
+    
+    # Other predictions
+    risk_of_rain = models.DecimalField(
+        max_digits=6, 
+        decimal_places=6,
+        validators=[
+            MinValueValidator(0),  # Lower limit
+            MaxValueValidator(1),  # Upper limit
+        ],
+        default = 0
+    )
 
     # series' time value is "name"
-    def add_entry(s, prediction):
-        # Check if coco value is nan
-        if (math.isnan(s.coco)):
-            coco_check = 0
-        else:
-            coco_check = s.coco
-            
+    def add_entry(s, prediction):        
         # Creating and saving a new entry
         e = Predicted_Entry(time=s.time.replace(tzinfo=pytz.UTC),
                   temp=s.temp,
@@ -109,8 +114,9 @@ class Predicted_Entry(models.Model):
                   wdir=s.wdir,
                   wspd=s.wspd,
                   pres=s.pres,
-                  coco=coco_check,
-                  prediction=prediction)
+                  coco=s.coco,
+                  prediction=prediction,
+                  risk_of_rain=s.risk)
         e.save()
         return 
     
