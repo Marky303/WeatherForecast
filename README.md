@@ -26,7 +26,7 @@ Table of contents of this README.md
 - Enter project's virtual environment, install required libraries, make database migrations and run development server 
 ```
 env\Scripts\activate
-pip install celery celery[rabbitmq] meteostat tqdm django django-pandas numpy pandas django-extensions ipython jupyter notebook==6.5.6 statsmodels matplotlib
+pip install celery celery[rabbitmq] meteostat tqdm django django-pandas numpy pandas django-extensions pytz scikit-learn ipython jupyter notebook==6.5.6 statsmodels matplotlib category_encoders
 cd backend
 python manage.py makemigrations
 python manage.py migrate
