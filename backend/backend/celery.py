@@ -14,6 +14,10 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
+# Broker heartbeat to stop disconnecting from broker
+app.conf.broker_heartbeat = 60
+app.conf.broker_heartbeat_checkrate = 2
+
 # Worker debugging
 # @app.task(bind=True, ignore_result=True)
 # def debug_task(self):

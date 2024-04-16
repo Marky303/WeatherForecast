@@ -58,6 +58,7 @@ MIDDLEWARE = [
 ]
 
 # Celery settings
+CELERYD_CONCURRENCY = 1
 BROKER_URL = 'amqp://guest:guest@localhost:15672/'  # RabbitMQ URL
 
 from datetime import timedelta
