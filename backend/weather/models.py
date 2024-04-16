@@ -73,7 +73,7 @@ class Prediction(models.Model):
     def __str__(self):
         return str(self.prediction_time) + " : " + str(self.accuracy)
     
-class Predicted_Entry(models.Model):
+class Predicted_Entry(models.Model):    
     # Foreign key to prediction
     prediction = models.ForeignKey(Prediction, on_delete=models.CASCADE)
     
@@ -105,18 +105,22 @@ class Predicted_Entry(models.Model):
     )
 
     # series' time value is "name"
-    def add_entry(s, prediction):        
+    def add_entry(s, prediction):   
+        # TEST
+        print(s)
+        print(prediction)
+             
         # Creating and saving a new entry
         e = Predicted_Entry(time=s.time.replace(tzinfo=pytz.UTC),
-                  temp=s.temp,
-                  dwpt=s.dwpt,
-                  rhum=s.rhum,
-                  wdir=s.wdir,
-                  wspd=s.wspd,
-                  pres=s.pres,
-                  coco=s.coco,
+                  temp=round(s.temp,1),
+                  dwpt=round(s.dwpt,1),
+                  rhum=round(s.rhum,1),
+                  wdir=round(s.wdir,1),
+                  wspd=round(s.wspd,1),
+                  pres=round(s.pres,1),
+                  coco=round(s.coco,1),
                   prediction=prediction,
-                  risk_of_rain=s.risk)
+                  risk_of_rain=round(s.risk,4))
         e.save()
         return 
     

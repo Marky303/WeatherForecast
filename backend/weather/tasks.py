@@ -14,6 +14,7 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 import category_encoders as ce
+import gc
 
 # Importing entry model
 from .models import *
@@ -29,8 +30,12 @@ dimensions = ['temp', 'dwpt', 'rhum', 'wdir', 'wspd', 'pres']
 entry_cycle = 24 # hours
 
 # SARIMA components deduced from entry lag
-non_seasonal_component = (0,1,0)
-seasonal_component = (1, 0, 1, 24)
+parameter_dict = {'temp': [(2,1,2),(2,0,3,8), 'c', 'lbfgs'], 
+                  'dwpt': [([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'ct', 'cg'], 
+                  'rhum': [(22,1,0),(0,0,6,8), 'c', 'cg'], 
+                  'wspd': [([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'c', 'cg'], 
+                  'wdir': [(2,0,2),(2, 0, [0, 1, 0, 1], 12), 'c', 'cg'], 
+                  'pres': [(2,0,2),(4,0,4,12), 'c', 'cg']}
 
 # Dictionary reduced to 5 categories
 # 0 means fair
@@ -120,18 +125,29 @@ def arima():
     train_set[dimensions] = train_set[dimensions].astype(np.float64)
     predictions[dimensions] = predictions[dimensions].astype(np.float64)
     
+    # Specific customizations (1)
+    train_set['pres'] = train_set['pres'] - 1000
+    
     for index in range(0,len(predictions)):
         predictions.loc[index, 'time'] += dt.timedelta(hours=entry_cycle)
         
     # Conduct SARIMA on every dimension/feature
     for dimension in tqdm(dimensions, desc="Predicting the next day's features..."):
         # Init SARIMAX model
-        model = SARIMAX(np.asarray(train_set[dimension]), order=non_seasonal_component, seasonal_order=seasonal_component)
-        model_fit = model.fit()
+        model = SARIMAX(np.asarray(train_set[dimension]), order=parameter_dict[dimension][0], seasonal_order=parameter_dict[dimension][1], trend=parameter_dict[dimension][2])
+        model_fit = model.fit(method=parameter_dict[dimension][3])
 
         # Making predictions
         prediction = model_fit.forecast(entry_cycle)
         predictions[dimension] = prediction
+        
+        # Deallocate memory
+        del model
+        del model_fit
+        gc.collect()
+
+    # Specific customizations (2)
+    predictions['pres'] = predictions['pres'] + 1000
         
     # Create + save prediction instance
     current_time = train_set.iloc[-1].time
