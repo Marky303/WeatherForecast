@@ -79,12 +79,12 @@ class Predicted_Entry(models.Model):
     
     # predicted_Entry fields
     time = models.DateTimeField(null=True)
-    temp = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
-    dwpt = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
-    rhum = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
-    wdir = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
-    wspd = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
-    pres = models.DecimalField(max_digits=6, decimal_places=1, default=-1)
+    temp = models.DecimalField(max_digits=10, decimal_places=1, default=-1)
+    dwpt = models.DecimalField(max_digits=10, decimal_places=1, default=-1)
+    rhum = models.DecimalField(max_digits=10, decimal_places=1, default=-1)
+    wdir = models.DecimalField(max_digits=10, decimal_places=1, default=-1)
+    wspd = models.DecimalField(max_digits=10, decimal_places=1, default=-1)
+    pres = models.DecimalField(max_digits=10, decimal_places=1, default=-1)
     coco = models.IntegerField(
         validators=[
             MinValueValidator(0),  # Lower limit
@@ -95,7 +95,7 @@ class Predicted_Entry(models.Model):
     
     # Other predictions
     risk_of_rain = models.DecimalField(
-        max_digits=6, 
+        max_digits=10, 
         decimal_places=6,
         validators=[
             MinValueValidator(0),  # Lower limit
@@ -106,21 +106,35 @@ class Predicted_Entry(models.Model):
 
     # series' time value is "name"
     def add_entry(s, prediction):   
+        # Rounding down
+        tempCheck = round(s.temp,1)
+        dwptCheck = round(s.dwpt,1)
+        rhumCheck = round(s.rhum,1)
+        wdirCheck = round(s.wdir,1)
+        wspdCheck = round(s.wspd,1)
+        presCheck = round(s.pres,1)
+        riskCheck = round(s.risk,6)
+        
         # TEST
-        print(s)
-        print(prediction)
-             
+        # print(tempCheck)
+        # print(dwptCheck)
+        # print(rhumCheck)
+        # print(wdirCheck)
+        # print(wspdCheck)
+        # print(presCheck)
+        # print(riskCheck)
+        
         # Creating and saving a new entry
         e = Predicted_Entry(time=s.time.replace(tzinfo=pytz.UTC),
-                  temp=round(s.temp,1),
-                  dwpt=round(s.dwpt,1),
-                  rhum=round(s.rhum,1),
-                  wdir=round(s.wdir,1),
-                  wspd=round(s.wspd,1),
-                  pres=round(s.pres,1),
-                  coco=round(s.coco,1),
+                  temp=tempCheck,
+                  dwpt=dwptCheck,
+                  rhum=rhumCheck,
+                  wdir=wdirCheck,
+                  wspd=wspdCheck,
+                  pres=presCheck,
+                  coco=s.coco,
                   prediction=prediction,
-                  risk_of_rain=round(s.risk,4))
+                  risk_of_rain=riskCheck)
         e.save()
         return 
     
