@@ -29,13 +29,21 @@ dimensions = ['temp', 'dwpt', 'rhum', 'wdir', 'wspd', 'pres']
 # ACF/PACF entry lag
 entry_cycle = 24 # hours
 
+# TEST
+parameter_dict_test =  {'temp': [(1,0,1),(1,0,1,8), 'c', 'cg'], 
+                        'dwpt': [(1,0,1),(1,0,1,8), 'c', 'cg'],
+                        'rhum': [(1,0,1),(1,0,1,8), 'c', 'cg'],
+                        'wspd': [(1,0,1),(1,0,1,8), 'c', 'cg'],
+                        'wdir': [(1,0,1),(1,0,1,8), 'c', 'cg'],
+                        'pres': [(1,0,1),(1,0,1,8), 'c', 'cg']}
+
 # SARIMA components deduced from entry lag
 parameter_dict = {'temp': [(2,1,2),(2,0,3,8), 'c', 'lbfgs'], 
                   'dwpt': [([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'ct', 'cg'], 
                   'rhum': [(22,1,0),(0,0,6,8), 'c', 'cg'], 
                   'wspd': [([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'c', 'cg'], 
                   'wdir': [(2,0,2),(2, 0, [0, 1, 0, 1], 12), 'c', 'cg'], 
-                  'pres': [(2,0,2),(4,0,4,12), 'c', 'cg']}
+                  'pres': [(2,0,2),(4,0,4,12), 'c', 'lbfgs']}
 
 # Dictionary reduced to 5 categories
 # 0 means fair
