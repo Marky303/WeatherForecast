@@ -17,6 +17,7 @@ app.autodiscover_tasks()
 # Broker heartbeat to stop disconnecting from broker
 app.conf.broker_heartbeat = 60
 app.conf.broker_heartbeat_checkrate = 2
+app.conf.worker_cancel_long_running_tasks_on_connection_loss=True
 
 # Worker debugging
 # @app.task(bind=True, ignore_result=True)
