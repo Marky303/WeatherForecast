@@ -38,12 +38,12 @@ parameter_dict_test =  {'temp': [(1,0,1),(1,0,1,8), 'c', 'cg'],
                         'pres': [(1,0,1),(1,0,1,8), 'c', 'cg']}
 
 # SARIMA components deduced from entry lag
-parameter_dict = {'temp': [(2,1,2),(2,0,3,8), 'c', 'lbfgs'], 
-                  'dwpt': [([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'ct', 'cg'], 
-                  'rhum': [(22,1,0),(0,0,6,8), 'c', 'cg'], 
-                  'wspd': [([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'c', 'cg'], 
-                  'wdir': [(2,0,2),(2, 0, [0, 1, 0, 1], 12), 'c', 'cg'], 
-                  'pres': [(2,0,2),(4,0,4,12), 'c', 'lbfgs']}
+parameter_dict = {'temp': [(2,1,2),(2,0,3,8), 'c', 'lbfgs', 50],                                       # Need testing 3 -> 6, overall pretty good
+                  'dwpt': [([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'ct', 'cg', 50], # Literally unsynced
+                  'rhum': [(22,1,0),(0,0,6,8), 'c', 'cg', 50],                                         # Need testing
+                  'wspd': [([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],0,2),(0,0,2,24), 'c', 'cg', 50],  # Synced
+                  'wdir': [(2,0,2),(2, 0, [0, 1, 0, 1], 12), 'c', 'cg', 50],                           # Synced
+                  'pres': [(2,0,2),(4,0,4,12), 'c', 'lbfgs', 40]}                                      # Synced
 
 # Dictionary reduced to 5 categories
 # 0 means fair
@@ -143,7 +143,7 @@ def arima():
     for dimension in tqdm(dimensions, desc="Predicting the next day's features..."):
         # Init SARIMAX model
         model = SARIMAX(np.asarray(train_set[dimension]), order=parameter_dict[dimension][0], seasonal_order=parameter_dict[dimension][1], trend=parameter_dict[dimension][2])
-        model_fit = model.fit(method=parameter_dict[dimension][3])
+        model_fit = model.fit(method=parameter_dict[dimension][3], maxiter=parameter_dict[dimension][4])
 
         # Making predictions
         prediction = model_fit.forecast(entry_cycle)
