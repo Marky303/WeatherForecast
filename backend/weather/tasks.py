@@ -101,9 +101,6 @@ def update_entry():
     data = Hourly('48900', start, end)
     data = data.fetch()
     
-    # Calculating accuracy
-    accuracy.delay()
-    
     if not data.empty:
         # Filling nan values using previous values
         columns_to_fill = ['temp', 'dwpt', 'rhum', 'wdir', 'wspd', 'pres']
@@ -117,6 +114,10 @@ def update_entry():
         arima.delay() 
     else:
         print ("data is up to date")
+        
+    # Calculating accuracy
+    accuracy.delay()
+    
     return
 
 # Processing weather data 
@@ -124,51 +125,51 @@ def update_entry():
 def arima():
     train_set = (read_frame(Entry.objects.all())[['time','temp','dwpt','rhum','wdir','wspd','pres','coco']]).copy(deep=True)
         
-    # # Preparing predictions set
-    # predictions = (read_frame(Entry.objects.all().order_by('-id')[:entry_cycle])[['time','temp','dwpt','rhum','wdir','wspd','pres','coco']]).copy(deep=True)
-    # predictions = predictions.sort_values(by='time')
-    # predictions.reset_index(drop=True, inplace=True)
+    # Preparing predictions set
+    predictions = (read_frame(Entry.objects.all().order_by('-id')[:entry_cycle])[['time','temp','dwpt','rhum','wdir','wspd','pres','coco']]).copy(deep=True)
+    predictions = predictions.sort_values(by='time')
+    predictions.reset_index(drop=True, inplace=True)
     
-    # # Converting from decimal to numpy float64
-    # train_set[dimensions] = train_set[dimensions].astype(np.float64)
-    # predictions[dimensions] = predictions[dimensions].astype(np.float64)
+    # Converting from decimal to numpy float64
+    train_set[dimensions] = train_set[dimensions].astype(np.float64)
+    predictions[dimensions] = predictions[dimensions].astype(np.float64)
     
-    # # Specific customizations (1)
-    # train_set['pres'] = train_set['pres'] - 1000
+    # Specific customizations (1)
+    train_set['pres'] = train_set['pres'] - 1000
     
-    # for index in range(0,len(predictions)):
-    #     predictions.loc[index, 'time'] += dt.timedelta(hours=entry_cycle)
+    for index in range(0,len(predictions)):
+        predictions.loc[index, 'time'] += dt.timedelta(hours=entry_cycle)
         
-    # # Conduct SARIMA on every dimension/feature
-    # for dimension in tqdm(dimensions, desc="Predicting the next day's features..."):
-    #     # Init SARIMAX model
-    #     model = SARIMAX(np.asarray(train_set[dimension]), order=parameter_dict[dimension][0], seasonal_order=parameter_dict[dimension][1], trend=parameter_dict[dimension][2])
-    #     model_fit = model.fit(method=parameter_dict[dimension][3], maxiter=parameter_dict[dimension][4])
+    # Conduct SARIMA on every dimension/feature
+    for dimension in tqdm(dimensions, desc="Predicting the next day's features..."):
+        # Init SARIMAX model
+        model = SARIMAX(np.asarray(train_set[dimension]), order=parameter_dict[dimension][0], seasonal_order=parameter_dict[dimension][1], trend=parameter_dict[dimension][2])
+        model_fit = model.fit(method=parameter_dict[dimension][3], maxiter=parameter_dict[dimension][4])
 
-    #     # Making predictions
-    #     prediction = model_fit.forecast(entry_cycle)
-    #     predictions[dimension] = prediction
+        # Making predictions
+        prediction = model_fit.forecast(entry_cycle)
+        predictions[dimension] = prediction
         
-    #     # Deallocate memory
-    #     del model
-    #     del model_fit
-    #     gc.collect()
+        # Deallocate memory
+        del model
+        del model_fit
+        gc.collect()
 
-    # # Specific customizations (2)
-    # predictions['pres'] = predictions['pres'] + 1000
+    # Specific customizations (2)
+    predictions['pres'] = predictions['pres'] + 1000
         
-    # # Create + save prediction instance
-    # current_time = train_set.iloc[-1].time
-    # new_prediction_ins = Prediction(prediction_time=current_time, predicted_entry_count=entry_cycle)
+    # Create + save prediction instance
+    current_time = train_set.iloc[-1].time
+    new_prediction_ins = Prediction(prediction_time=current_time, predicted_entry_count=entry_cycle)
     
-    # # Predict weather condition
-    # predictions = coco(predictions)
-    # predictions = rain(predictions)
+    # Predict weather condition
+    predictions = coco(predictions)
+    predictions = rain(predictions)
     
-    # # Create + save predicted entries
-    # new_prediction_ins.save()
-    # for i in tqdm(range(len(predictions)), desc="Saving predicted values..."):
-    #         Predicted_Entry.add_entry(predictions.iloc[i], new_prediction_ins)
+    # Create + save predicted entries
+    new_prediction_ins.save()
+    for i in tqdm(range(len(predictions)), desc="Saving predicted values..."):
+            Predicted_Entry.add_entry(predictions.iloc[i], new_prediction_ins)
 
 @shared_task(acks_late=False, reject_on_worker_lost=True)
 def coco(predictions):
